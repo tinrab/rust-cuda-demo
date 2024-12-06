@@ -1,0 +1,5 @@
+BasedOnStyle: Google
+
+IndentWidth: 4
+IndentExternBlock: true
+AlignAfterOpenBracket: BlockIndent
