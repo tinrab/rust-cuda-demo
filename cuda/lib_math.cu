@@ -2,7 +2,10 @@
 #include "lib_math.h"
 
 __global__ void vector_add_kernel(
-    int n, const float* a, const float* b, float* c
+    int n,
+    const float* a,
+    const float* b,
+    float* c
 ) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n) {
@@ -23,9 +26,21 @@ cudaError_t math_vector_add(int n, const float* a, const float* b, float* c) {
     CHECK_CUDA(cudaMemcpy(device_a, a, BYTES, cudaMemcpyHostToDevice));
     CHECK_CUDA(cudaMemcpy(device_b, b, BYTES, cudaMemcpyHostToDevice));
 
-    vector_add_kernel<<<(n + 255) / 256, 256>>>(
-        n, device_a, device_b, device_c
-    );
+    int threads = 256;
+    int blocks = (n + threads - 1) / threads;
+    dim3 grid(blocks, 1, 1);
+    dim3 block(threads, 1, 1);
+
+    vector_add_kernel<<<grid, block>>>(n, device_a, device_b, device_c);
+
+    // void* args[] = {
+    //     reinterpret_cast<void*>(&n),
+    //     reinterpret_cast<void*>(&device_a),
+    //     reinterpret_cast<void*>(&device_b),
+    //     reinterpret_cast<void*>(&device_c),
+    // };
+    // cudaLaunchKernel((void*)vector_add_kernel, grid, block, args);
+
     CHECK_CUDA(cudaDeviceSynchronize());
     CHECK_CUDA(cudaGetLastError());
 

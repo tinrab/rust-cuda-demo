@@ -3,4 +3,4 @@
 
 #include "lib_cublas.h"
 
-#endif  // LIB_H
+#endif // LIB_H

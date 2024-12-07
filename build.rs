@@ -22,10 +22,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rustc-link-search=native=/opt/cuda/lib");
 
     println!("cargo:rustc-link-lib=cuda");
+    // Dynamic
     println!("cargo:rustc-link-lib=cudart");
     println!("cargo:rustc-link-lib=cublas");
+    // Static
+    // println!("cargo:rustc-link-lib=static=cudart_static");
+    // println!("cargo:rustc-link-lib=static=cublas_static");
+    // println!("cargo:rustc-link-lib=static=cublasLt_static");
+    // println!("cargo:rustc-link-lib=culibos");
 
-    println!("cargo:rerun-if-changed={}", "./build.rs");
     println!("cargo:rerun-if-changed={}", "./cuda");
 
     Ok(())

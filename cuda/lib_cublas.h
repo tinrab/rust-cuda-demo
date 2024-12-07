@@ -6,9 +6,14 @@
 
 extern "C" {
     cudaError_t cublas_sgemm(
-        int n, const float* a, const float* b, float* c, float alpha,
-        float beta, cublasStatus_t* cublas_status
+        int n,
+        const float* a,
+        const float* b,
+        float* c,
+        float alpha,
+        float beta,
+        cublasStatus_t* cublas_status
     );
 }
 
-#endif  // LIB_CUBLAS_H
+#endif // LIB_CUBLAS_H

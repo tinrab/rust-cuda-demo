@@ -17,29 +17,19 @@ pub mod ffi {
 
         /// Returns the description string for an error code.
         #[link_name = "cudaGetErrorString"]
-        pub fn cuda_get_error_string(error_id: c_int) -> *const c_char;
+        pub fn cuda_get_error_string(code: c_int) -> *const c_char;
     }
 }
 
 #[macro_export]
 macro_rules! handle_cuda_error {
     ($expr:expr) => {{
-        let error_id = { $expr };
-        if error_id != 0 {
-            $crate::error::CudaResult::Err(
-                $crate::error::InternalError {
-                    id: error_id,
-                    message: std::ffi::CStr::from_ptr($crate::cuda::ffi::cuda_get_error_string(
-                        error_id,
-                    ))
-                    .to_str()
-                    .unwrap()
-                    .into(),
-                }
-                .into(),
-            )
+        use $crate::error::{CudaResult, InternalError};
+        let code = { $expr };
+        if code != 0 {
+            CudaResult::Err(InternalError::new(code).into())
         } else {
-            $crate::error::CudaResult::Ok(())
+            CudaResult::Ok(())
         }
     }};
 }

@@ -2,7 +2,12 @@
 #include "lib_cublas.h"
 
 cudaError_t cublas_sgemm(
-    int n, const float* a, const float* b, float* c, float alpha, float beta,
+    int n,
+    const float* a,
+    const float* b,
+    float* c,
+    float alpha,
+    float beta,
     cublasStatus_t* cublas_status
 ) {
     int n2 = n * n;
@@ -19,13 +24,16 @@ cudaError_t cublas_sgemm(
 
     // Allocate device memory
     CHECK_CUDA(cudaMalloc(
-        reinterpret_cast<void**>(&device_a), n2 * sizeof(device_a[0])
+        reinterpret_cast<void**>(&device_a),
+        n2 * sizeof(device_a[0])
     ));
     CHECK_CUDA(cudaMalloc(
-        reinterpret_cast<void**>(&device_b), n2 * sizeof(device_b[0])
+        reinterpret_cast<void**>(&device_b),
+        n2 * sizeof(device_b[0])
     ));
     CHECK_CUDA(cudaMalloc(
-        reinterpret_cast<void**>(&device_c), n2 * sizeof(device_c[0])
+        reinterpret_cast<void**>(&device_c),
+        n2 * sizeof(device_c[0])
     ));
 
     // Copy data from host to device
@@ -44,8 +52,20 @@ cudaError_t cublas_sgemm(
 
     // Perform matrix multiplication
     *cublas_status = cublasSgemm(
-        handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha, device_a, n,
-        device_b, n, &beta, device_c, n
+        handle,
+        CUBLAS_OP_N,
+        CUBLAS_OP_N,
+        n,
+        n,
+        n,
+        &alpha,
+        device_a,
+        n,
+        device_b,
+        n,
+        &beta,
+        device_c,
+        n
     );
     if (*cublas_status != CUBLAS_STATUS_SUCCESS) {
         return cudaErrorUnknown;

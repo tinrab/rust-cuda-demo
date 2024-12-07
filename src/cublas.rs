@@ -1,6 +1,6 @@
 use std::ffi::c_int;
 
-use crate::{cuda, error::CudaResult};
+use crate::error::CudaResult;
 
 pub mod ffi {
     use std::ffi::c_char;
@@ -35,35 +35,14 @@ pub mod ffi {
 
 macro_rules! handle_cublas_error {
     ($expr:expr, $status:expr) => {{
-        let error_id = { $expr };
+        use $crate::error::{CublasError, CudaResult, InternalError};
+        let error_code = { $expr };
         if ($status) != 0 {
-            $crate::error::CudaResult::Err(
-                $crate::error::CublasError {
-                    id: $status,
-                    name: std::ffi::CStr::from_ptr(ffi::cublas_get_status_name($status))
-                        .to_str()
-                        .unwrap()
-                        .into(),
-                    message: std::ffi::CStr::from_ptr(ffi::cublas_get_status_string($status))
-                        .to_str()
-                        .unwrap()
-                        .into(),
-                }
-                .into(),
-            )
-        } else if error_id != 0 {
-            $crate::error::CudaResult::Err(
-                $crate::error::InternalError {
-                    id: error_id,
-                    message: std::ffi::CStr::from_ptr(cuda::ffi::cuda_get_error_string(error_id))
-                        .to_str()
-                        .unwrap()
-                        .into(),
-                }
-                .into(),
-            )
+            CudaResult::Err(CublasError::new($status).into())
+        } else if error_code != 0 {
+            CudaResult::Err(InternalError::new(error_code).into())
         } else {
-            $crate::error::CudaResult::Ok(())
+            CudaResult::Ok(())
         }
     }};
 }
